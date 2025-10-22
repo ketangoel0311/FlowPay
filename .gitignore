@@ -1,8 +1,9 @@
 node_modules/
-.next/
-dist/
+frontend/.next/
+frontend/dist/
 .env
 .env.*
 !.env.example
+!frontend/.env.example
 .DS_Store
 *.log
