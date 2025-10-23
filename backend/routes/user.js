@@ -47,54 +47,53 @@ router.put("/profile", auth, async (req, res) => {
 router.get("/dashboard", auth, async (req, res) => {
   try {
     const now = new Date();
-    const sevenDaysAgo = new Date(now);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const transactions = await Transaction.find({
+
+    const last7Days = new Date();
+    last7Days.setDate(now.getDate() - 7);
+
+    const txns = await Transaction.find({
       user: req.userId,
-      createdAt: { $gte: sevenDaysAgo },
+      createdAt: { $gte: last7Days },
     });
-    const dayLabels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
-    const statistics = dayLabels.map((day, i) => {
-      const d = new Date(now);
-      d.setDate(d.getDate() - (6 - i));
-      d.setHours(0, 0, 0, 0);
-      const next = new Date(d);
-      next.setDate(next.getDate() + 1);
-      const dayTxns = transactions.filter((t) => {
-        const tDate = new Date(t.createdAt);
-        return tDate >= d && tDate < next;
+
+    let statistics = [];
+
+    for (let i = 0; i < 7; i++) {
+
+      let start = new Date();
+      start.setDate(now.getDate() - (6 - i));
+      start.setHours(0, 0, 0, 0);
+
+      let end = new Date(start);
+      end.setDate(start.getDate() + 1);
+
+      let income = 0;
+      let expense = 0;
+
+      for (let t of txns) {
+        let d = new Date(t.createdAt);
+
+        if (d >= start && d < end) {
+
+          if (t.type === "income") {
+            income += t.amount;
+          } else {
+            expense += Math.abs(t.amount);
+          }
+
+        }
+      }
+
+      statistics.push({
+        day: "Day " + (i + 1),
+        income,
+        expense
       });
-      const expense = dayTxns
-        .filter((t) => t.type === "expense" || t.type === "transfer")
-        .reduce((s, t) => s + Math.abs(t.amount), 0);
-      const income = dayTxns
-        .filter((t) => t.type === "income")
-        .reduce((s, t) => s + t.amount, 0);
-      return {
-        day,
-        expense: Math.round(expense * 100) / 100,
-        income: Math.round(income * 100) / 100,
-      };
-    });
-    const byCategory = {};
-    transactions.forEach((t) => {
-      if (t.type !== "expense" && t.type !== "transfer") return;
-      const cat = t.category || "Other";
-      byCategory[cat] = (byCategory[cat] || 0) + Math.abs(t.amount);
-    });
-    const totalSpent = Object.values(byCategory).reduce((s, v) => s + v, 0);
-    const spendingOverview =
-      totalSpent > 0
-        ? Object.entries(byCategory)
-            .map(([category, amount]) => ({
-              category,
-              percentage: Math.round((amount / totalSpent) * 100),
-            }))
-            .sort((a, b) => b.percentage - a.percentage)
-            .slice(0, 6)
-        : [];
-    res.json({ statistics, spendingOverview, goals: null });
-  } catch (error) {
+    }
+
+    res.json({ statistics });
+
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
