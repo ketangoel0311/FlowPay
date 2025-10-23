@@ -1,54 +1,37 @@
 # FLOWPAY
 
-A simple full-stack banking simulation app built using Next.js, Node.js, Express, and MongoDB. It allows users to manage accounts, transfer money between users, and view transaction history.
+A simple full-stack expense tracking application built using Next.js, Node.js, Express, and MongoDB. It allows users to record transactions, manage expenses, and view their financial activity.
 
----
-
-## 🚀 Features
-
+🚀 Features
 - User authentication using JWT
-- Create and manage user accounts
-- Simulated peer-to-peer money transfer
-- Ledger-based transaction tracking (credit & debit entries)
-- Balance validation before transfer
+- Record and manage income and expense transactions
+- Basic support for adjusting amounts between records
+- Transaction tracking using credit (income) and debit (expense) entries
+- Summary view showing total income and expenses
 - Transaction history with filtering and pagination
 - Responsive UI using Next.js
 
----
-
-## 🛠 Tech Stack
-
+🛠 Tech Stack
 - Frontend: Next.js
 - Backend: Node.js, Express.js
 - Database: MongoDB
 - Authentication: JWT
 
----
+📌 How it Works
+- Each user records their transactions (income and expenses)
+- Transactions are stored as credit (income) and debit (expense)
+- Totals are calculated based on these entries
+- Users can view, filter, and paginate their transaction history
+- A summary section provides an overview of total income and expenses
 
-## 📌 How it Works
-
-- Each user has an account with transactions
-- When a transfer happens:
-  - Sender balance is checked
-  - Amount is deducted from sender
-  - Amount is added to receiver
-  - Transaction is recorded in the system
-- Users can view and filter their transaction history
-
----
-
-## 📂 Main Backend Features
-
+📂 Main Backend Features
 - Authentication middleware to protect routes
-- Transaction APIs for creating and fetching transactions
-- Balance validation logic to prevent invalid transfers
-- Pagination to handle large transaction data efficiently
+- APIs for creating and fetching transactions
+- Basic validation to ensure correct data entry
+- Pagination for efficient handling of large datasets
 
----
+▶️ Run Locally
 
-## ▶️ Run Locally
-
-```bash
 # backend
 cd backend
 npm install
